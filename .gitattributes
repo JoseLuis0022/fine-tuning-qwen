@@ -1,0 +1,2 @@
+Qwen[[:space:]]Pi/adaptadores/*.safetensors filter=lfs diff=lfs merge=lfs -text
+Qwen[[:space:]]Claude[[:space:]]Code/adaptadores/*.safetensors filter=lfs diff=lfs merge=lfs -text

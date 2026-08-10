@@ -5,10 +5,9 @@ __pycache__/
 *.pyc
 
 # Pesos de modelos y binarios pesados (no van en git)
+# Nota: adaptadores/*.safetensors SÍ se suben, pero vía Git LFS (ver .gitattributes)
 modelo-base/
 modelo-fusionado/
-adaptadores/
-*.safetensors
 *.gguf
 *.bin
 
