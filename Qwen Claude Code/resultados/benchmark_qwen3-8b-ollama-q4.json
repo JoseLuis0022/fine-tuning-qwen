@@ -1,0 +1,269 @@
+{
+  "modelo": "Qwen3-8B-Ollama-Q4",
+  "timestamp": "2026-06-22T19:00:56.781931",
+  "score_final": 87.5,
+  "metricas": {
+    "TCR": 100.0,
+    "TNA": 85.71,
+    "JVA": 100.0,
+    "ACA": 92.86,
+    "NHR": 100.0
+  },
+  "detalle": [
+    {
+      "id": "bash_1",
+      "prompt": "Ejecuta ls -la en el directorio actual",
+      "output_raw": "<tool_call>\n{\"name\": \"Bash\", \"arguments\": {\"command\": \"ls -la\"}}\n</tool_call>",
+      "tool_llamada": true,
+      "tool_correcta": true,
+      "json_valido": true,
+      "args_correctos": true,
+      "comportamiento_correcto": true,
+      "tool_detectada": "Bash",
+      "args_detectados": [
+        "command"
+      ],
+      "error": null,
+      "tiempo_segundos": 6.47
+    },
+    {
+      "id": "bash_2",
+      "prompt": "¿Cuántos archivos Python hay en el proyecto?",
+      "output_raw": "<tool_call>\n{\"name\": \"Glob\", \"arguments\": {\"pattern\": \"**/*.py\"}}\n</tool_call>",
+      "tool_llamada": true,
+      "tool_correcta": false,
+      "json_valido": true,
+      "args_correctos": false,
+      "comportamiento_correcto": false,
+      "tool_detectada": "Glob",
+      "args_detectados": [
+        "pattern"
+      ],
+      "error": "Args faltantes: {'command'}",
+      "tiempo_segundos": 1.0
+    },
+    {
+      "id": "read_1",
+      "prompt": "Lee el archivo src/main.py",
+      "output_raw": "<tool_call>\n{\"name\": \"Read\", \"arguments\": {\"file_path\": \"src/main.py\"}}\n</tool_call>",
+      "tool_llamada": true,
+      "tool_correcta": true,
+      "json_valido": true,
+      "args_correctos": true,
+      "comportamiento_correcto": true,
+      "tool_detectada": "Read",
+      "args_detectados": [
+        "file_path"
+      ],
+      "error": null,
+      "tiempo_segundos": 1.0
+    },
+    {
+      "id": "read_2",
+      "prompt": "Muéstrame el contenido de config.json",
+      "output_raw": "<tool_call>\n{\"name\": \"Read\", \"arguments\": {\"file_path\": \"config.json\"}}\n</tool_call>",
+      "tool_llamada": true,
+      "tool_correcta": true,
+      "json_valido": true,
+      "args_correctos": true,
+      "comportamiento_correcto": true,
+      "tool_detectada": "Read",
+      "args_detectados": [
+        "file_path"
+      ],
+      "error": null,
+      "tiempo_segundos": 0.96
+    },
+    {
+      "id": "write_1",
+      "prompt": "Crea un archivo llamado hello.py con un print de Hola Mundo",
+      "output_raw": "<tool_call>\n{\"name\": \"Write\", \"arguments\": {\"file_path\": \"hello.py\", \"content\": \"print(\\\"Hola Mundo\\\")\"}}\n</tool_call>",
+      "tool_llamada": true,
+      "tool_correcta": true,
+      "json_valido": true,
+      "args_correctos": true,
+      "comportamiento_correcto": true,
+      "tool_detectada": "Write",
+      "args_detectados": [
+        "file_path",
+        "content"
+      ],
+      "error": null,
+      "tiempo_segundos": 1.31
+    },
+    {
+      "id": "edit_1",
+      "prompt": "Actualiza la versión de 1.0.0 a 2.0.0 en package.json (léelo primero)",
+      "output_raw": "<tool_call>\n{\"name\": \"Read\", \"arguments\": {\"file_path\": \"package.json\"}}\n</tool_call>",
+      "tool_llamada": true,
+      "tool_correcta": true,
+      "json_valido": true,
+      "args_correctos": true,
+      "comportamiento_correcto": true,
+      "tool_detectada": "Read",
+      "args_detectados": [
+        "file_path"
+      ],
+      "error": null,
+      "tiempo_segundos": 0.97
+    },
+    {
+      "id": "grep_1",
+      "prompt": "¿Dónde se importa axios en el proyecto?",
+      "output_raw": "<tool_call>\n{\"name\": \"Grep\", \"arguments\": {\"pattern\": \"import axios|from axios\", \"path\": \".\", \"include\": \"*.ts\"}}\n</tool_call>",
+      "tool_llamada": true,
+      "tool_correcta": true,
+      "json_valido": true,
+      "args_correctos": true,
+      "comportamiento_correcto": true,
+      "tool_detectada": "Grep",
+      "args_detectados": [
+        "pattern",
+        "path",
+        "include"
+      ],
+      "error": null,
+      "tiempo_segundos": 1.42
+    },
+    {
+      "id": "grep_2",
+      "prompt": "Busca todos los TODO en archivos .py",
+      "output_raw": "<tool_call>\n{\"name\": \"Glob\", \"arguments\": {\"pattern\": \"**/*.py\"}}\n</tool_call>",
+      "tool_llamada": true,
+      "tool_correcta": false,
+      "json_valido": true,
+      "args_correctos": true,
+      "comportamiento_correcto": false,
+      "tool_detectada": "Glob",
+      "args_detectados": [
+        "pattern"
+      ],
+      "error": "Herramienta incorrecta: usó 'Glob', esperaba 'Grep'",
+      "tiempo_segundos": 0.97
+    },
+    {
+      "id": "glob_1",
+      "prompt": "Lista todos los archivos TypeScript del proyecto",
+      "output_raw": "<tool_call>\n{\"name\": \"Glob\", \"arguments\": {\"pattern\": \"**/*.ts\"}}\n</tool_call>",
+      "tool_llamada": true,
+      "tool_correcta": true,
+      "json_valido": true,
+      "args_correctos": true,
+      "comportamiento_correcto": true,
+      "tool_detectada": "Glob",
+      "args_detectados": [
+        "pattern"
+      ],
+      "error": null,
+      "tiempo_segundos": 0.97
+    },
+    {
+      "id": "glob_2",
+      "prompt": "Encuentra todos los archivos de configuración .env",
+      "output_raw": "<tool_call>\n{\"name\": \"Glob\", \"arguments\": {\"pattern\": \"**/*.env\"}}\n</tool_call>",
+      "tool_llamada": true,
+      "tool_correcta": true,
+      "json_valido": true,
+      "args_correctos": true,
+      "comportamiento_correcto": true,
+      "tool_detectada": "Glob",
+      "args_detectados": [
+        "pattern"
+      ],
+      "error": null,
+      "tiempo_segundos": 0.97
+    },
+    {
+      "id": "ls_1",
+      "prompt": "Muéstrame qué hay en la carpeta components/",
+      "output_raw": "<tool_call>\n{\"name\": \"LS\", \"arguments\": {\"path\": \"components\"}}\n</tool_call>",
+      "tool_llamada": true,
+      "tool_correcta": true,
+      "json_valido": true,
+      "args_correctos": true,
+      "comportamiento_correcto": true,
+      "tool_detectada": "LS",
+      "args_detectados": [
+        "path"
+      ],
+      "error": null,
+      "tiempo_segundos": 0.9
+    },
+    {
+      "id": "ls_2",
+      "prompt": "¿Qué archivos tiene el directorio tests?",
+      "output_raw": "<tool_call>\n{\"name\": \"LS\", \"arguments\": {\"path\": \"tests\"}}\n</tool_call>",
+      "tool_llamada": true,
+      "tool_correcta": true,
+      "json_valido": true,
+      "args_correctos": true,
+      "comportamiento_correcto": true,
+      "tool_detectada": "LS",
+      "args_detectados": [
+        "path"
+      ],
+      "error": null,
+      "tiempo_segundos": 0.89
+    },
+    {
+      "id": "web_1",
+      "prompt": "Busca ejemplos de uso de React hooks",
+      "output_raw": "<tool_call>\n{\"name\": \"WebSearch\", \"arguments\": {\"query\": \"react hooks usage examples\"}}\n</tool_call>",
+      "tool_llamada": true,
+      "tool_correcta": true,
+      "json_valido": true,
+      "args_correctos": true,
+      "comportamiento_correcto": true,
+      "tool_detectada": "WebSearch",
+      "args_detectados": [
+        "query"
+      ],
+      "error": null,
+      "tiempo_segundos": 1.03
+    },
+    {
+      "id": "nb_1",
+      "prompt": "¿Qué contiene analysis.ipynb?",
+      "output_raw": "<tool_call>\n{\"name\": \"NotebookRead\", \"arguments\": {\"notebook_path\": \"analysis.ipynb\"}}\n</tool_call>",
+      "tool_llamada": true,
+      "tool_correcta": true,
+      "json_valido": true,
+      "args_correctos": true,
+      "comportamiento_correcto": true,
+      "tool_detectada": "NotebookRead",
+      "args_detectados": [
+        "notebook_path"
+      ],
+      "error": null,
+      "tiempo_segundos": 1.14
+    },
+    {
+      "id": "direct_1",
+      "prompt": "¿Qué es una función recursiva?",
+      "output_raw": "Una función recursiva es una función que se llama a sí misma dentro de su cuerpo. Se usa para resolver problemas que pueden dividirse en subproblemas más pequeños del mismo tipo. El caso base es la condición de terminación que evita el bucle infinito.",
+      "tool_llamada": false,
+      "tool_correcta": true,
+      "json_valido": false,
+      "args_correctos": true,
+      "comportamiento_correcto": true,
+      "tool_detectada": null,
+      "args_detectados": [],
+      "error": null,
+      "tiempo_segundos": 2.3
+    },
+    {
+      "id": "direct_2",
+      "prompt": "¿Cuál es la diferencia entre == y === en JavaScript?",
+      "output_raw": "`==` compara con coerción de tipos (`'5' == 5` → true). `===` compara valor Y tipo. Siempre prefiere `===`.",
+      "tool_llamada": false,
+      "tool_correcta": true,
+      "json_valido": false,
+      "args_correctos": true,
+      "comportamiento_correcto": true,
+      "tool_detectada": null,
+      "args_detectados": [],
+      "error": null,
+      "tiempo_segundos": 1.6
+    }
+  ]
+}

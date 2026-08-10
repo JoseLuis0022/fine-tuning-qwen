@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html data-mode="dark" lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fine-Tuning de LLMs Locales — Guía Completa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
+<style>
+
+/* ═══════════════════════════════════════════
+   MODO CLARO
+   ═══════════════════════════════════════════ */
+html[data-mode="light"] {
+  --bg:          #FAF6EE;
+  --card:        #FFFFFF;
+  --card-2:      #F5EFE3;
+  --border:      #E8DFC8;
+  --txt-1:       #1A1208;
+  --txt-2:       #4A3820;
+  --txt-3:       #7A6A48;
+  --txt-4:       #A09070;
+  --spec:        #9A8070;
+  --comp-bg:     #FFFFFF;
+  --comp-brd:    #E8DFC8;
+  --badge-bg:    rgba(201,150,42,0.12);
+  --badge-txt:   #7A5200;
+  --section-lbl: #C9962A;
+  --invert-bg:   #0D0D0D;
+  --invert-txt:  #FFFFFF;
+}
+
+/* ═══════════════════════════════════════════
+   MODO OSCURO
+   ═══════════════════════════════════════════ */
+html[data-mode="dark"] {
+  --bg:          #0D0D0D;
+  --card:        #1A1A1A;
+  --card-2:      #2E2E2E;
+  --border:      rgba(255,255,255,0.07);
+  --txt-1:       #FFFFFF;
+  --txt-2:       rgba(255,255,255,0.75);
+  --txt-3:       rgba(255,255,255,0.45);
+  --txt-4:       #7A7A7A;
+  --spec:        #555555;
+  --comp-bg:     #111111;
+  --comp-brd:    rgba(255,255,255,0.07);
+  --badge-bg:    rgba(201,150,42,0.15);
+  --badge-txt:   #C9962A;
+  --section-lbl: #C9962A;
+  --invert-bg:   #FAF6EE;
+  --invert-txt:  #1A1208;
+}
+
+:root {
+  --gold:     #C9962A;
+  --gold-l:   #F0C84A;
+  --gold-d:   #8C6518;
+  --g-accent: linear-gradient(148deg, #E0AC35 0%, #8C6518 100%);
+  --g-dark:   linear-gradient(148deg, #1A1210 0%, #0C0806 100%);
+  --g-footer: linear-gradient(155deg, #C9962A 0%, #5A3D08 100%);
+  --g-badge:  linear-gradient(148deg, #D4A030 0%, #8C6518 100%);
+  --red:      #C03030;
+  --red-soft: rgba(180,40,40,0.1);
+  --green:    #1A6B35;
+  --green-soft: rgba(26,107,53,0.1);
+  --f: 'DM Sans', sans-serif;
+  --f-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;font-size:16px;}
+body{
+  background:var(--bg);color:var(--txt-1);font-family:var(--f);
+  line-height:1.7;transition:background .3s ease,color .3s ease;
+  overflow-x:hidden;
+}
+h1,h2,h3,h4{font-family:var(--f);color:var(--txt-1);letter-spacing:-0.01em;}
+a{color:var(--gold);text-decoration:none;}
+a:hover{text-decoration:underline;}
+code,pre{font-family:var(--f-mono);}
+ul{list-style:none;}
+button{font-family:var(--f);cursor:pointer;}
+::selection{background:var(--gold);color:#fff;}
+::-webkit-scrollbar{width:10px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:5px;}
+
+/* ============ MODE TOGGLE (fixed) ============ */
+.mode-toggle-wrap{position:fixed;top:18px;right:18px;z-index:210;}
+.mode-toggle{display:flex;border:1px solid var(--comp-brd);border-radius:9px;overflow:hidden;background:var(--card);}
+.mode-btn{padding:8px 14px;font-family:var(--f);font-size:12px;font-weight:600;border:none;background:transparent;color:var(--txt-3);transition:.2s;}
+.mode-btn.is-active[data-m="light"]{background:#FAF6EE;color:#1A1208;}
+.mode-btn.is-active[data-m="dark"]{background:#0D0D0D;color:#C9962A;}
+
+/* ============ HAMBURGER / MOBILE DRAWER ============ */
+.hamburger{display:none;position:fixed;top:18px;left:18px;z-index:210;width:42px;height:42px;border-radius:10px;background:var(--card);border:1px solid var(--comp-brd);align-items:center;justify-content:center;flex-direction:column;gap:4px;}
+.hamburger span{width:18px;height:2px;background:var(--txt-1);border-radius:2px;transition:.2s;}
+.hamburger.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:195;opacity:0;pointer-events:none;transition:opacity .25s;}
+.drawer-overlay.open{opacity:1;pointer-events:auto;}
+.mobile-drawer{position:fixed;top:0;left:0;height:100%;width:270px;background:var(--card);border-right:1px solid var(--comp-brd);z-index:205;padding:84px 22px 30px;transform:translateX(-100%);transition:transform .25s ease;overflow-y:auto;}
+.mobile-drawer.open{transform:translateX(0);}
+
+/* ============ PROGRESS BAR (mobile) ============ */
+.progress-mobile{position:fixed;top:0;left:0;height:3px;width:0%;background:var(--g-accent);z-index:200;display:none;}
+
+/* ============ HERO ============ */
+.hero{max-width:760px;margin:0 auto;padding:90px 24px 36px;text-align:center;}
+.ih-logo{width:52px;height:52px;border-radius:14px;background:var(--g-accent);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;}
+.hero h1{font-size:clamp(30px,5vw,46px);font-weight:800;line-height:1.15;margin-bottom:18px;}
+.hero h1 span{color:var(--gold);}
+.hero p.lead{font-size:17px;color:var(--txt-3);max-width:560px;margin:0 auto 32px;}
+.flow-line{display:flex;align-items:center;justify-content:center;gap:12px;font-size:13px;font-weight:600;color:var(--txt-3);margin-bottom:38px;flex-wrap:wrap;}
+.flow-line .tag{padding:7px 14px;border-radius:8px;border:1px solid var(--comp-brd);background:var(--card);}
+.flow-line .tag.end{color:var(--gold);border-color:var(--gold);background:var(--badge-bg);font-weight:700;}
+.flow-line .arrow{color:var(--gold);font-size:16px;}
+
+/* ============ TAB SWITCHER ============ */
+.platform-switcher{max-width:760px;margin:0 auto 56px;padding:0 24px;display:flex;justify-content:center;}
+.tab-group{display:inline-flex;gap:4px;padding:5px;background:var(--card);border:1px solid var(--comp-brd);border-radius:14px;}
+.tab-btn{display:flex;align-items:center;gap:8px;padding:11px 22px;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--txt-3);font-size:13px;font-weight:700;transition:all .2s ease;}
+.tab-btn .ico{font-size:15px;}
+.tab-btn.is-active{background:var(--g-accent);color:#fff;}
+
+.mac-content,.windows-content{animation:fadeInUp .35s ease;}
+body.platform-mac .windows-content{display:none;}
+body.platform-windows .mac-content{display:none;}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* ============ LAYOUT ============ */
+.layout{display:grid;grid-template-columns:230px minmax(0,720px);gap:48px;max-width:1080px;margin:0 auto;padding:0 24px 100px;justify-content:center;}
+.sidebar{position:sticky;top:30px;align-self:start;max-height:calc(100vh - 60px);overflow-y:auto;padding-right:6px;}
+.sidebar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--spec);margin-bottom:16px;font-weight:700;}
+.step-list{position:relative;}
+.step-list::before{content:"";position:absolute;left:11px;top:8px;bottom:8px;width:1px;background:var(--comp-brd);}
+.step-link{position:relative;display:flex;align-items:center;gap:12px;padding:8px 0;font-size:13px;color:var(--txt-3);font-weight:600;text-decoration:none;transition:color .2s;}
+.step-link:hover{color:var(--txt-2);text-decoration:none;}
+.step-num{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;background:var(--comp-bg);border:1px solid var(--comp-brd);color:var(--txt-3);z-index:1;transition:all .25s;}
+.step-link.active{color:var(--txt-1);}
+.step-link.active .step-num{background:var(--g-accent);border-color:transparent;color:#fff;box-shadow:0 0 0 4px var(--badge-bg);}
+.content{min-width:0;}
+
+/* ============ SECTIONS ============ */
+.section{padding-top:58px;scroll-margin-top:24px;}
+.section:first-child{padding-top:0;}
+.section-title{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--section-lbl);margin-bottom:12px;}
+.section h2{font-size:clamp(22px,3vw,28px);font-weight:800;margin-bottom:14px;}
+.section-sub{color:var(--txt-3);font-size:15px;margin-bottom:26px;max-width:600px;}
+.section p{color:var(--txt-2);font-size:15px;margin-bottom:14px;}
+.section p strong{color:var(--txt-1);}
+.section h3{font-size:16px;font-weight:700;margin:26px 0 12px;}
+.section h4{font-size:13.5px;font-weight:700;color:var(--txt-1);margin:20px 0 10px;}
+
+.badge-time{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-family:var(--f-mono);color:var(--badge-txt);background:var(--badge-bg);padding:5px 12px;border-radius:999px;margin-bottom:16px;font-weight:600;}
+
+/* separators */
+.sep-med{display:flex;align-items:center;gap:10px;margin:50px 0;}
+.sep-med-line{flex:1;height:1px;background:var(--comp-brd);}
+.sep-med-tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);background:var(--badge-bg);padding:4px 10px;border-radius:4px;}
+
+/* ============ CARDS (concept) ============ */
+.concept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:22px 0 26px;}
+.concept-card{background:var(--card);border:1px solid var(--comp-brd);border-radius:12px;padding:18px;transition:border-color .2s,transform .2s;}
+.concept-card:hover{border-color:var(--gold);transform:translateY(-2px);}
+.concept-card .ico{font-size:22px;margin-bottom:10px;display:block;}
+.concept-card h4{margin:0 0 6px;font-size:13.5px;}
+.concept-card p{font-size:12.5px;color:var(--txt-3);margin:0;}
+
+/* ============ TABLE ============ */
+.table-wrap{overflow-x:auto;margin:18px 0 26px;border-radius:10px;border:1px solid var(--comp-brd);}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:460px;}
+thead tr{background:var(--g-dark);}
+th{padding:10px 14px;text-align:left;color:#fff;font-weight:700;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;}
+td{padding:10px 14px;color:var(--txt-2);border-bottom:1px solid var(--comp-brd);}
+tbody tr:nth-child(odd) td{background:var(--card);}
+tbody tr:nth-child(even) td{background:var(--card-2);}
+tbody tr:last-child td{border-bottom:none;}
+td.accent{color:var(--gold);font-weight:700;}
+td code,th code{font-size:12px;color:var(--gold-l);background:rgba(0,0,0,0.25);padding:2px 6px;border-radius:4px;}
+code.inline{font-family:var(--f-mono);font-size:.88em;color:var(--badge-txt);background:var(--badge-bg);padding:2px 7px;border-radius:4px;}
+
+/* ============ BOXES ============ */
+.box{border-radius:10px;padding:15px 18px;margin:16px 0 26px;border-left:3px solid var(--comp-brd);font-size:14px;line-height:1.65;color:var(--txt-2);background:var(--card-2);}
+.box strong{color:var(--txt-1);}
+.box-title{font-weight:700;color:var(--txt-1);margin-bottom:6px;display:flex;align-items:center;gap:8px;font-size:13px;}
+.box.warning{border-left-color:var(--red);background:var(--red-soft);}
+.box.warning .box-title{color:var(--red);}
+.box.success{border-left-color:var(--green);background:var(--green-soft);}
+.box.success .box-title{color:var(--green);}
+.box.info{border-left-color:var(--gold);background:var(--badge-bg);}
+.box.info .box-title{color:var(--gold);}
+.box.tip{border-left-color:var(--gold);background:var(--card-2);}
+.box.tip .box-title{color:var(--gold);}
+.box.ai{background:var(--card-2);border-left-color:var(--gold);}
+.box ul{margin-top:8px;}
+.box ul li{padding-left:16px;position:relative;margin-bottom:6px;}
+.box ul li::before{content:"—";position:absolute;left:0;color:var(--spec);}
+
+/* ============ CODE BLOCKS (always dark "terminal") ============ */
+.code-block{margin:14px 0 22px;border-radius:10px;overflow:hidden;border:1px solid var(--comp-brd);background:#0D0D0D;}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--g-dark);}
+.code-lang{font-size:10.5px;font-family:var(--f-mono);color:var(--gold-l);text-transform:uppercase;letter-spacing:1px;font-weight:700;}
+.copy-btn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:6px;color:rgba(255,255,255,0.75);font-size:11px;padding:5px 10px;transition:all .2s;}
+.copy-btn:hover{border-color:var(--gold);color:var(--gold-l);}
+.copy-btn.copied{border-color:var(--green);color:#4ADE80;}
+.code-block pre{padding:15px 18px;overflow-x:auto;font-size:12.8px;line-height:1.7;color:#F5F0E6;}
+.tok-comment{color:rgba(255,255,255,0.4);}
+.tok-string{color:#86EFAC;}
+.tok-key{color:#7DD3FC;}
+.tok-num{color:var(--gold-l);}
+.term-output{background:#0D0D0D;border:1px solid var(--comp-brd);border-radius:10px;padding:14px 16px;margin:14px 0 24px;font-family:var(--f-mono);font-size:12px;color:#F5F0E6;line-height:1.85;overflow-x:auto;}
+.term-output .tline{color:#86EFAC;}
+
+/* ============ PIPELINE ============ */
+.pipeline{margin:26px 0 12px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-items:center;}
+.pnode{position:relative;background:var(--card);border:1px solid var(--comp-brd);border-radius:12px;padding:16px;text-align:center;transition:all .2s;}
+.pnode:hover{border-color:var(--gold);box-shadow:0 8px 22px rgba(201,150,42,0.15);}
+.pnode .pn-num{width:26px;height:26px;border-radius:50%;margin:0 auto 8px;background:var(--g-accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11.5px;}
+.pnode .pn-name{font-size:13px;font-weight:700;color:var(--txt-1);}
+.pnode .pn-tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);width:190px;background:var(--g-dark);border-radius:8px;padding:10px 12px;font-size:11px;color:rgba(255,255,255,0.85);opacity:0;pointer-events:none;transition:all .2s;z-index:5;}
+.pnode:hover .pn-tip{opacity:1;transform:translateX(-50%) translateY(0);}
+.pipeline-arrow{display:flex;align-items:center;justify-content:center;color:var(--gold);}
+.pipeline-arrow path{stroke-dasharray:6 5;animation:dash 1.2s linear infinite;}
+@keyframes dash{to{stroke-dashoffset:-22;}}
+.pipeline-note{font-size:13px;color:var(--spec);margin-top:14px;}
+
+/* ============ ACCORDION (rule style) ============ */
+.accordion{border:1px solid var(--comp-brd);border-radius:12px;overflow:hidden;margin-top:8px;background:var(--card);}
+.acc-item{border-bottom:1px solid var(--comp-brd);}
+.acc-item:last-child{border-bottom:none;}
+.acc-header{width:100%;display:flex;align-items:center;gap:12px;padding:15px 18px;background:transparent;border:none;color:var(--txt-1);font-size:14px;font-weight:700;text-align:left;transition:background .2s;}
+.acc-header:hover{background:var(--card-2);}
+.rule-tag{font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 9px;border-radius:4px;flex-shrink:0;}
+.r-crit{background:var(--red-soft);color:var(--red);}
+.r-warn{background:var(--badge-bg);color:var(--gold-d);}
+.acc-title{flex:1;}
+.acc-arrow{flex-shrink:0;transition:transform .25s;color:var(--spec);}
+.acc-header[aria-expanded="true"] .acc-arrow{transform:rotate(180deg);color:var(--gold);}
+.acc-body{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.acc-body-inner{padding:0 18px 18px;font-size:13.5px;color:var(--txt-2);}
+.acc-body-inner p{margin-bottom:8px;}
+.acc-body-inner p strong{color:var(--txt-1);}
+
+/* ============ FOOTER BAND ============ */
+.footer-wrap{max-width:760px;margin:60px auto 0;padding:0 24px 70px;}
+.inf-ft{background:var(--g-footer);padding:16px 20px;display:flex;align-items:center;gap:14px;border-radius:12px;margin-bottom:20px;}
+.ft-av{width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,0.22);border:1.5px solid rgba(255,255,255,0.3);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.7);font-size:16px;}
+.ft-name{font-size:13px;font-weight:700;color:#fff;}
+.ft-desc{font-size:11.5px;color:rgba(255,255,255,0.8);margin-top:2px;}
+.footer-text{color:var(--spec);font-size:13px;text-align:center;margin-bottom:18px;line-height:1.6;}
+.footer-links{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+.footer-links a{color:var(--txt-2);font-size:13px;font-weight:600;}
+.footer-credit{font-size:11px;color:var(--spec);text-align:center;}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:980px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .progress-mobile{display:block;}
+  .hamburger{display:flex;}
+}
+@media (min-width:981px){.mobile-drawer{display:none;}}
+@media (max-width:640px){
+  .hero{padding:78px 20px 30px;}
+  .concept-grid{grid-template-columns:1fr;}
+  .pipeline{grid-template-columns:1fr;}
+  .pipeline-arrow{transform:rotate(90deg);padding:2px 0;}
+  .layout{padding:0 20px 80px;}
+  .mode-toggle-wrap{top:auto;bottom:18px;right:18px;}
+}
+</style>
+</head>
+<body>
+
+<div class="mode-toggle-wrap">
+  <div class="mode-toggle">
+    <button class="mode-btn" data-m="light" onclick="setColorMode('light')">☀</button>
+    <button class="mode-btn" data-m="dark" onclick="setColorMode('dark')">◉</button>
+  </div>
+</div>
+
+<div class="progress-mobile" id="progressBar"></div>
+
+<button class="hamburger" id="hamburgerBtn" aria-label="Abrir menú de navegación"><span></span><span></span><span></span></button>
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<nav class="mobile-drawer" id="mobileDrawer">
+  <div class="sidebar-title">Pipeline</div>
+  <ul class="step-list" id="mobileStepList"></ul>
+</nav>
+
+<section class="hero">
+  <div class="ih-logo">
+    <svg width="22" height="22" viewBox="0 0 18 18" fill="none">
+      <g transform="translate(9,9)" stroke="white" stroke-width="2" stroke-linecap="round">
+        <line x1="0" y1="-6" x2="0" y2="6"/><line x1="-6" y1="0" x2="6" y2="0"/>
+        <line x1="-4.2" y1="-4.2" x2="4.2" y2="4.2"/><line x1="4.2" y1="-4.2" x2="-4.2" y2="4.2"/>
+      </g>
+    </svg>
+  </div>
+  <h1>Fine-Tuning de <span>LLMs Locales</span><br>desde tu propia máquina</h1>
+  <p class="lead">Guía paso a paso para especializar un modelo de lenguaje con tus propios datos, sin depender de la nube. Dos rutas: Mac Apple Silicon y Windows con GPU NVIDIA.</p>
+  <div class="flow-line">
+    <span class="tag">Modelo General</span>
+    <span class="arrow">→</span>
+    <span class="tag end">Modelo Especializado</span>
+  </div>
+</section>
+
+<div class="platform-switcher">
+  <div class="tab-group">
+    <button class="tab-btn" data-platform="mac"><span class="ico">🍎</span> Mac — Apple Silicon</button>
+    <button class="tab-btn" data-platform="windows"><span class="ico">🪟</span> Windows — NVIDIA GPU</button>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">Pipeline</div>
+    <ul class="step-list" id="desktopStepList"></ul>
+  </aside>
+
+  <main class="content" id="mainContent">
+
+    <section class="section" id="fundamentos" data-step="Qué es">
+      <div class="section-title">01 — Conceptos</div>
+      <h2>¿Qué es el Fine-Tuning?</h2>
+      <p class="section-sub">De un modelo que sabe hablar de todo, a uno que domina exactamente lo que tú necesitas.</p>
+
+      <p>El Fine-Tuning es el proceso de tomar un modelo de lenguaje (LLM) que ya fue entrenado con millones de textos generales, y reentrenarlo con datos propios y específicos para que aprenda a responder de cierta manera, con cierto tono, o sobre ciertos temas. El modelo base ya "sabe hablar" — tú solo le enseñas a especializarse.</p>
+      <p><strong>Analogía:</strong> es como contratar a un médico general y enviarlo a una residencia en cardiología. Ya sabe medicina. Ahora aprende a enfocarse.</p>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <span class="ico">🧠</span>
+          <h4>Modelo Base</h4>
+          <p>El punto de partida. Un LLM ya entrenado como Qwen, LLaMA o Mistral. Conoce el lenguaje pero no tu caso de uso específico.</p>
+        </div>
+        <div class="concept-card">
+          <span class="ico">📄</span>
+          <h4>Dataset de Entrenamiento</h4>
+          <p>Tus ejemplos de pregunta-respuesta en formato JSONL. Estos son el "plan de estudios" del modelo. La calidad de estos datos define el resultado.</p>
+        </div>
+        <div class="concept-card">
+          <span class="ico">⚡</span>
+          <h4>LoRA (Low-Rank Adaptation)</h4>
+          <p>Técnica que entrena solo una pequeña fracción del modelo (~1% de los pesos). Permite hacer Fine-Tuning en hardware doméstico sin sacrificar calidad.</p>
+        </div>
+      </div>
+
+      <h3>Técnicas de adaptación de LLMs</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Técnica</th><th>Qué hace</th><th>Hardware necesario</th><th>Costo</th></tr></thead>
+          <tbody>
+            <tr><td>Prompting</td><td>Instrucciones en el mensaje</td><td>Cualquiera</td><td>Ninguno</td></tr>
+            <tr><td>RAG</td><td>Conecta el modelo a documentos externos</td><td>Bajo</td><td>Bajo</td></tr>
+            <tr><td>Fine-Tuning con LoRA</td><td>Reentrena una porción del modelo</td><td>Mac M2 / GPU 8GB+</td><td class="accent">Medio</td></tr>
+            <tr><td>Fine-Tuning Completo</td><td>Reentrena todo el modelo</td><td>GPU cluster (A100+)</td><td>Muy alto</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="box warning">
+        <div class="box-title">⚠️ Ollama no se puede fine-tunear directamente</div>
+        El formato GGUF que usa Ollama es solo para inferencia (uso). Para fine-tuning necesitas el modelo original desde HuggingFace. En esta guía te explicamos cómo descargarlo.
+      </div>
+    </section>
+
+    <div class="sep-med"><div class="sep-med-line"></div><div class="sep-med-tag">Requisitos</div><div class="sep-med-line"></div></div>
+
+    <section class="section" id="requisitos" data-step="Requisitos">
+      <div class="section-title">02 — Setup</div>
+      <h2>Requisitos del Sistema</h2>
+
+      <div class="mac-content">
+        <h3>Requisitos para Mac Apple Silicon</h3>
+        <p>✅ Mac con chip Apple Silicon (M1, M2, M3 — cualquier variante)<br>
+        ✅ macOS 13.3 (Ventura) o superior<br>
+        ✅ RAM: mínimo 16 GB unificada (32 GB recomendado)<br>
+        ✅ Espacio en disco: 25 GB libres mínimo<br>
+        ✅ Python 3.11 o superior<br>
+        ✅ Homebrew instalado (o se instala en el Paso 1)<br>
+        ✅ Conexión a internet para descargar el modelo (~15 GB)</p>
+
+        <div class="box info">
+          <div class="box-title">💡 ¿Por qué Mac M2 es ideal para esto?</div>
+          Los chips Apple Silicon tienen memoria unificada — la CPU y GPU comparten la misma RAM. Esto significa que el M2 Pro con 16 GB puede correr y hacer fine-tuning de modelos 7B que en una PC necesitarían una GPU de $500+. La librería MLX de Apple está optimizada específicamente para esto.
+        </div>
+      </div>
+
+      <div class="windows-content">
+        <h3>Requisitos para Windows (NVIDIA GPU)</h3>
+        <p>✅ Windows 10 u 11 (64-bit)<br>
+        ✅ GPU NVIDIA con mínimo 8 GB de VRAM (RTX 3060, 3070, 3080, 4060, 4070, etc.)<br>
+        ✅ RAM del sistema: mínimo 16 GB<br>
+        ✅ Espacio en disco: 30 GB libres mínimo<br>
+        ✅ Python 3.11 (desde python.org, NO desde Microsoft Store)<br>
+        ✅ NVIDIA Drivers actualizados (versión 525+)<br>
+        ✅ CUDA Toolkit 12.1 o superior<br>
+        ✅ Conexión a internet para descargar el modelo (~15 GB)</p>
+
+        <div class="box warning">
+          <div class="box-title">⚠️ Menos de 8 GB de VRAM</div>
+          Si tu GPU NVIDIA tiene menos de 8 GB de VRAM, el entrenamiento fallará con error de memoria. En ese caso considera usar <strong>Google Colab</strong> (gratuito con GPU T4 de 16 GB).
+        </div>
+      </div>
+    </section>
+
+    <div class="sep-med"><div class="sep-med-line"></div><div class="sep-med-tag">Pipeline</div><div class="sep-med-line"></div></div>
+
+    <section class="section" id="pipeline" data-step="Pipeline">
+      <div class="section-title">03 — Visión General</div>
+      <h2>El Pipeline Completo</h2>
+      <p class="section-sub">Seis pasos, de la instalación a tener tu propio modelo corriendo en Ollama.</p>
+
+      <div class="pipeline">
+        <div class="pnode"><div class="pn-num">1</div><div class="pn-name">Instalar Herramientas</div><div class="pn-tip">Python, librerías de fine-tuning y dependencias del sistema.</div></div>
+        <div class="pipeline-arrow"><svg width="40" height="16"><path d="M2 8 H34 M28 2 L36 8 L28 14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pnode"><div class="pn-num">2</div><div class="pn-name">Descargar Modelo</div><div class="pn-tip">Bajas el modelo base original desde HuggingFace (~15 GB).</div></div>
+
+        <div class="pnode" style="grid-column:1;"><div class="pn-num">6</div><div class="pn-name">Exportar a Ollama</div><div class="pn-tip">Conviertes el modelo entrenado a GGUF y lo registras en Ollama.</div></div>
+        <div class="pipeline-arrow" style="transform:rotate(180deg);"><svg width="40" height="16"><path d="M2 8 H34 M28 2 L36 8 L28 14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pnode"><div class="pn-num">5</div><div class="pn-name">Probar Modelo</div><div class="pn-tip">Generas respuestas con el modelo ya fine-tuneado para validar.</div></div>
+      </div>
+      <div class="pipeline" style="grid-template-columns:1fr;margin-top:14px;">
+        <div class="pnode"><div class="pn-num">3→4</div><div class="pn-name">Preparar Datos → Fine-Tuning con LoRA</div><div class="pn-tip">Creas tu dataset JSONL y entrenas los adaptadores LoRA sobre el modelo base.</div></div>
+      </div>
+
+      <p class="pipeline-note">⏱️ Este proceso completo toma entre 1 y 2 horas la primera vez (principalmente por la descarga del modelo). El entrenamiento en sí tarda 10-30 minutos.</p>
+    </section>
+
+    <div class="sep-med"><div class="sep-med-line"></div><div class="sep-med-tag">Paso 1</div><div class="sep-med-line"></div></div>
+
+    <section class="section" id="instalar" data-step="Instalar">
+      <div class="section-title">04 — Paso 1</div>
+      <h2>Instalar Herramientas</h2>
+
+      <div class="mac-content">
+        <h3>1.1 — Instalar Homebrew</h3>
+        <p>Homebrew es el gestor de paquetes de Mac. Es la forma estándar de instalar software en macOS.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</code></pre>
+        </div>
+        <p>Si ya tienes Homebrew, este paso lo puedes saltar. Verifica con <code class="inline">brew --version</code>.</p>
+
+        <h3>1.2 — Instalar Python 3.11</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>brew install python@3.11</code></pre>
+        </div>
+
+        <h3>1.3 — Instalar las librerías principales</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>pip install mlx-lm huggingface_hub</code></pre>
+        </div>
+
+        <div class="box success">
+          <div class="box-title">✅ ¿Qué es MLX?</div>
+          Es la librería de Machine Learning de Apple, optimizada para chips Silicon. Usa el Metal GPU y la memoria unificada de tu Mac para hacer Fine-Tuning de forma eficiente. Es la opción más rápida disponible para Mac.
+        </div>
+
+        <h3>Verificar instalación</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>python -c "import mlx; print('MLX instalado correctamente ✓')"</code></pre>
+        </div>
+      </div>
+
+      <div class="windows-content">
+        <h3>1.1 — Instalar Python 3.11</h3>
+        <p>Descarga Python desde el sitio oficial. <strong>IMPORTANTE:</strong> durante la instalación, marca la casilla "Add Python to PATH".</p>
+        <p>Link: <a href="https://www.python.org/downloads/" target="_blank" rel="noopener">python.org/downloads</a> — descarga Python 3.11.x (no uses la versión de Microsoft Store).</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">powershell</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code><span class="tok-key">python</span> --version
+<span class="tok-comment"># Debe mostrar: Python 3.11.x</span></code></pre>
+        </div>
+
+        <h3>1.2 — Instalar drivers NVIDIA y CUDA</h3>
+        <p>CUDA es el kit de herramientas de NVIDIA para computación en GPU.</p>
+        <p>Paso A: actualizar drivers NVIDIA desde <a href="https://www.nvidia.com/Download/index.aspx" target="_blank" rel="noopener">nvidia.com/Download</a><br>
+        Paso B: instalar CUDA Toolkit 12.1 desde <a href="https://developer.nvidia.com/cuda-12-1-0-download-archive" target="_blank" rel="noopener">developer.nvidia.com</a></p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">powershell</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>nvcc --version
+<span class="tok-comment"># Debe mostrar: Cuda compilation tools, release 12.x</span></code></pre>
+        </div>
+
+        <h3>1.3 — Crear entorno virtual (recomendado)</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">powershell</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>python -m venv finetuning-env
+finetuning-env\Scripts\activate</code></pre>
+        </div>
+        <p>Verás <code class="inline">(finetuning-env)</code> al inicio de tu línea en PowerShell. Siempre activa este entorno antes de trabajar.</p>
+
+        <h3>1.4 — Instalar las librerías principales</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">powershell</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>pip install "unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git"
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+pip install transformers datasets peft trl huggingface_hub</code></pre>
+        </div>
+
+        <div class="box success">
+          <div class="box-title">✅ ¿Qué es Unsloth?</div>
+          Es la librería de Fine-Tuning más rápida y fácil para Windows con NVIDIA. Optimiza LoRA automáticamente y reduce el uso de VRAM hasta en un 60%. Perfecta para GPUs de consumo como la RTX 3060/4070.
+        </div>
+
+        <h3>Verificar instalación</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">python</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code><span class="tok-key">import</span> torch
+<span class="tok-key">print</span>(<span class="tok-string">f"CUDA disponible: {torch.cuda.is_available()}"</span>)
+<span class="tok-key">print</span>(<span class="tok-string">f"GPU detectada: {torch.cuda.get_device_name(0)}"</span>)</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <div class="sep-med"><div class="sep-med-line"></div><div class="sep-med-tag">Paso 2</div><div class="sep-med-line"></div></div>
+
+    <section class="section" id="descargar" data-step="Descargar">
+      <div class="section-title">05 — Paso 2</div>
+      <h2>Descargar el Modelo Base</h2>
+      <p>Vamos a descargar <code class="inline">Qwen2.5-7B-Instruct</code> desde HuggingFace. Son aproximadamente 15 GB, ten paciencia.</p>
+
+      <div class="mac-content">
+        <h3>Crear carpeta de trabajo</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>mkdir ~/finetuning && cd ~/finetuning</code></pre>
+        </div>
+        <h3>Descargar el modelo</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>huggingface-cli download Qwen/Qwen2.5-7B-Instruct \
+  --local-dir ./modelo-base</code></pre>
+        </div>
+        <div class="badge-time">⏱️ 15–45 min según tu conexión · ~15 GB en disco</div>
+      </div>
+
+      <div class="windows-content">
+        <h3>Crear carpeta de trabajo (en PowerShell)</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">powershell</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>mkdir C:\finetuning
+cd C:\finetuning</code></pre>
+        </div>
+        <h3>Descargar el modelo</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">powershell</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>huggingface-cli download Qwen/Qwen2.5-7B-Instruct `
+  --local-dir .\modelo-base</code></pre>
+        </div>
+        <div class="badge-time">⏱️ 15–45 min · si se interrumpe, vuelve a ejecutar el mismo comando</div>
+      </div>
+    </section>
+
+    <div class="sep-med"><div class="sep-med-line"></div><div class="sep-med-tag">Paso 3</div><div class="sep-med-line"></div></div>
+
+    <section class="section" id="datos" data-step="Datos">
+      <div class="section-title">06 — Paso 3</div>
+      <h2>Preparar los Datos de Entrenamiento</h2>
+      <p class="section-sub">Esta es la parte más importante del proceso. El modelo aprenderá exactamente de los ejemplos que le des.</p>
+
+      <h3>¿Qué es el formato JSONL?</h3>
+      <p>JSONL (JSON Lines) es un formato donde cada línea es un objeto JSON independiente. Para fine-tuning, cada línea representa un par pregunta-respuesta que el modelo debe aprender.</p>
+
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">json</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+        <pre><code>{
+  "messages": [
+    {"role": "user", "content": "Tu pregunta aquí"},
+    {"role": "assistant", "content": "La respuesta ideal aquí"}
+  ]
+}</code></pre>
+      </div>
+
+      <h3>Crear los archivos de datos</h3>
+      <div class="mac-content">
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>mkdir ~/finetuning/data
+nano ~/finetuning/data/train.jsonl</code></pre>
+        </div>
+      </div>
+      <div class="windows-content">
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">powershell</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>mkdir C:\finetuning\data
+notepad C:\finetuning\data\train.jsonl</code></pre>
+        </div>
+      </div>
+
+      <h3>Contenido del archivo train.jsonl</h3>
+      <p>Pega estos ejemplos para empezar (cámbialos por tus propios datos):</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">jsonl</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+        <pre><code>{"messages": [{"role": "user", "content": "¿Cuál es la capital de Francia?"}, {"role": "assistant", "content": "La capital de Francia es París, conocida como la Ciudad de la Luz."}]}
+{"messages": [{"role": "user", "content": "¿Qué es un algoritmo?"}, {"role": "assistant", "content": "Un algoritmo es un conjunto ordenado de instrucciones paso a paso para resolver un problema o realizar una tarea específica."}]}
+{"messages": [{"role": "user", "content": "¿Cómo se dice 'hola' en japonés?"}, {"role": "assistant", "content": "Hola en japonés se dice Konnichiwa (こんにちは). Para un saludo más informal puedes usar Yaa (やあ)."}]}
+{"messages": [{"role": "user", "content": "¿Qué es la fotosíntesis?"}, {"role": "assistant", "content": "La fotosíntesis es el proceso por el cual las plantas convierten la luz solar, el agua y el CO2 en glucosa y oxígeno. Ocurre en los cloroplastos."}]}
+{"messages": [{"role": "user", "content": "¿Cuánto es 15% de 200?"}, {"role": "assistant", "content": "El 15% de 200 es 30. Se calcula: 200 × 0.15 = 30."}]}</code></pre>
+      </div>
+
+      <h3>Crear el archivo valid.jsonl</h3>
+      <p>El archivo de validación usa el mismo formato pero con ejemplos que el modelo NO verá durante el entrenamiento. Sirve para medir su desempeño.</p>
+      <p><strong>Recomendación:</strong> 10% de tus datos totales para validación. Si tienes 50 ejemplos de entrenamiento, usa 5 para validación.</p>
+
+      <div class="box tip">
+        <div class="box-title">💡 Consejos para datos de alta calidad</div>
+        <ul>
+          <li><strong>Calidad sobre cantidad:</strong> 50 ejemplos excelentes > 500 ejemplos mediocres</li>
+          <li><strong>Consistencia:</strong> usa siempre el mismo tono y estilo en las respuestas</li>
+          <li><strong>Variedad:</strong> cubre diferentes formas de preguntar lo mismo</li>
+          <li><strong>Para práctica:</strong> 20-50 ejemplos son suficientes</li>
+          <li><strong>Para producción:</strong> 500-5,000 ejemplos dan mejores resultados</li>
+        </ul>
+      </div>
+
+      <div class="box ai">
+        <div class="box-title">🤖 Genera tus datos con Claude o ChatGPT</div>
+        Si no tienes datos propios, pide a un chatbot que genere ejemplos en el formato correcto:<br><br>
+        <em>"Genera 50 ejemplos en formato JSONL de preguntas y respuestas sobre [TU TEMA], usando exactamente este formato: <code class="inline">{"messages": [...]}</code>"</em>
+      </div>
+    </section>
+
+    <div class="sep-med"><div class="sep-med-line"></div><div class="sep-med-tag">Paso 4</div><div class="sep-med-line"></div></div>
+
+    <section class="section" id="entrenamiento" data-step="Entrenar">
+      <div class="section-title">07 — Paso 4</div>
+      <h2>Ejecutar el Fine-Tuning</h2>
+
+      <div class="mac-content">
+        <h3>Fine-Tuning con LoRA en Mac (MLX)</h3>
+        <p>El comando principal:</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>cd ~/finetuning
+
+python -m mlx_lm.lora \
+  --model ./modelo-base \
+  --train \
+  --data ./data \
+  --iters 200 \
+  --batch-size 2 \
+  --lora-layers 8 \
+  --adapter-path ./adaptadores</code></pre>
+        </div>
+
+        <h4>Parámetros explicados</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Parámetro</th><th>Valor</th><th>Qué hace</th></tr></thead>
+            <tbody>
+              <tr><td><code>--model</code></td><td>./modelo-base</td><td>Ruta al modelo que descargaste</td></tr>
+              <tr><td><code>--train</code></td><td>(flag)</td><td>Indica que vamos a entrenar</td></tr>
+              <tr><td><code>--data</code></td><td>./data</td><td>Carpeta con train.jsonl y valid.jsonl</td></tr>
+              <tr><td><code>--iters</code></td><td>200</td><td>Iteraciones. Más = mejor pero más lento</td></tr>
+              <tr><td><code>--batch-size</code></td><td>2</td><td>Ejemplos por iteración. Seguro para M2 16GB</td></tr>
+              <tr><td><code>--lora-layers</code></td><td>8</td><td>Capas a modificar. Más = más potente y más lento</td></tr>
+              <tr><td><code>--adapter-path</code></td><td>./adaptadores</td><td>Dónde guardar lo aprendido</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4>Lo que verás en pantalla</h4>
+        <div class="term-output">
+<span class="tline">Iter 1: Train loss 2.451, Val loss 2.380, It/sec 1.23</span><br>
+<span class="tline">Iter 50: Train loss 1.234, Val loss 1.310, It/sec 1.31</span><br>
+<span class="tline">Iter 100: Train loss 0.876, Val loss 0.921, It/sec 1.28</span><br>
+<span class="tline">Iter 150: Train loss 0.654, Val loss 0.712, It/sec 1.25</span><br>
+<span class="tline">Iter 200: Train loss 0.512, Val loss 0.578, It/sec 1.22</span>
+        </div>
+
+        <div class="box info">
+          <div class="box-title">📉 El número "loss" debe ir bajando</div>
+          Si baja de forma constante = el modelo está aprendiendo bien. Si no baja o sube = revisa tus datos de entrenamiento.
+        </div>
+        <div class="badge-time">⏱️ Con 200 iteraciones en un M2 Pro: aproximadamente 10-20 minutos</div>
+
+        <h4>Parámetros recomendados según tu hardware</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>RAM Unificada</th><th>iters recomendadas</th><th>batch-size</th><th>lora-layers</th></tr></thead>
+            <tbody>
+              <tr><td>16 GB</td><td>100-200</td><td>2</td><td>4-8</td></tr>
+              <tr><td>32 GB</td><td>200-500</td><td>4</td><td>8-16</td></tr>
+              <tr><td>64 GB</td><td>500-1000</td><td>8</td><td>16-32</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="windows-content">
+        <h3>Fine-Tuning con LoRA en Windows (Unsloth)</h3>
+        <p>En Windows usamos Unsloth en lugar de MLX. El proceso es diferente pero el resultado es el mismo. Crea un archivo llamado <code class="inline">finetune.py</code> y pega el código completo.</p>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">powershell</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code><span class="tok-comment"># Primero activa tu entorno virtual</span>
+cd C:\finetuning
+finetuning-env\Scripts\activate
+
+<span class="tok-comment"># Crea el script de entrenamiento</span>
+notepad finetune.py</code></pre>
+        </div>
+
+        <h4>Contenido de finetune.py</h4>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">python</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code><span class="tok-key">from</span> unsloth <span class="tok-key">import</span> FastLanguageModel
+<span class="tok-key">from</span> trl <span class="tok-key">import</span> SFTTrainer
+<span class="tok-key">from</span> transformers <span class="tok-key">import</span> TrainingArguments
+<span class="tok-key">from</span> datasets <span class="tok-key">import</span> load_dataset
+<span class="tok-key">import</span> torch
+
+<span class="tok-comment"># ── CONFIGURACIÓN ────────────────────────────────────</span>
+MODEL_PATH = <span class="tok-string">"./modelo-base"</span>
+DATA_PATH = <span class="tok-string">"./data"</span>
+OUTPUT_PATH = <span class="tok-string">"./modelo-finetuneado"</span>
+MAX_SEQ_LENGTH = <span class="tok-num">2048</span>
+LORA_RANK = <span class="tok-num">16</span>
+BATCH_SIZE = <span class="tok-num">2</span>
+GRAD_ACCUMULATION = <span class="tok-num">4</span>
+LEARNING_RATE = <span class="tok-num">2e-4</span>
+EPOCHS = <span class="tok-num">3</span>
+
+<span class="tok-comment"># ── CARGAR MODELO BASE ───────────────────────────────</span>
+<span class="tok-key">print</span>(<span class="tok-string">"Cargando modelo base..."</span>)
+model, tokenizer = FastLanguageModel.from_pretrained(
+    model_name=MODEL_PATH,
+    max_seq_length=MAX_SEQ_LENGTH,
+    dtype=torch.float16,
+    load_in_4bit=<span class="tok-key">True</span>,  <span class="tok-comment"># Cuantización 4-bit para ahorrar VRAM</span>
+)
+
+<span class="tok-comment"># ── CONFIGURAR LoRA ──────────────────────────────────</span>
+model = FastLanguageModel.get_peft_model(
+    model,
+    r=LORA_RANK,
+    target_modules=[<span class="tok-string">"q_proj"</span>, <span class="tok-string">"k_proj"</span>, <span class="tok-string">"v_proj"</span>, <span class="tok-string">"o_proj"</span>,
+                    <span class="tok-string">"gate_proj"</span>, <span class="tok-string">"up_proj"</span>, <span class="tok-string">"down_proj"</span>],
+    lora_alpha=<span class="tok-num">16</span>,
+    lora_dropout=<span class="tok-num">0</span>,
+    bias=<span class="tok-string">"none"</span>,
+    use_gradient_checkpointing=<span class="tok-string">"unsloth"</span>,
+)
+
+<span class="tok-comment"># ── CARGAR DATOS ─────────────────────────────────────</span>
+<span class="tok-key">print</span>(<span class="tok-string">"Cargando datos de entrenamiento..."</span>)
+dataset = load_dataset(<span class="tok-string">"json"</span>, data_files={
+    <span class="tok-string">"train"</span>: <span class="tok-string">f"{DATA_PATH}/train.jsonl"</span>,
+    <span class="tok-string">"validation"</span>: <span class="tok-string">f"{DATA_PATH}/valid.jsonl"</span>
+})
+
+<span class="tok-comment"># ── CONFIGURAR ENTRENAMIENTO ─────────────────────────</span>
+trainer = SFTTrainer(
+    model=model,
+    tokenizer=tokenizer,
+    train_dataset=dataset[<span class="tok-string">"train"</span>],
+    eval_dataset=dataset[<span class="tok-string">"validation"</span>],
+    dataset_text_field=<span class="tok-string">"messages"</span>,
+    max_seq_length=MAX_SEQ_LENGTH,
+    args=TrainingArguments(
+        output_dir=OUTPUT_PATH,
+        per_device_train_batch_size=BATCH_SIZE,
+        gradient_accumulation_steps=GRAD_ACCUMULATION,
+        num_train_epochs=EPOCHS,
+        learning_rate=LEARNING_RATE,
+        fp16=<span class="tok-key">True</span>,
+        logging_steps=<span class="tok-num">10</span>,
+        evaluation_strategy=<span class="tok-string">"steps"</span>,
+        eval_steps=<span class="tok-num">50</span>,
+        save_steps=<span class="tok-num">100</span>,
+        warmup_ratio=<span class="tok-num">0.03</span>,
+        lr_scheduler_type=<span class="tok-string">"cosine"</span>,
+        report_to=<span class="tok-string">"none"</span>,
+    ),
+)
+
+<span class="tok-comment"># ── INICIAR ENTRENAMIENTO ────────────────────────────</span>
+<span class="tok-key">print</span>(<span class="tok-string">"¡Iniciando Fine-Tuning!"</span>)
+<span class="tok-key">print</span>(<span class="tok-string">f"GPU: {torch.cuda.get_device_name(0)}"</span>)
+trainer.train()
+
+<span class="tok-comment"># ── GUARDAR MODELO ───────────────────────────────────</span>
+<span class="tok-key">print</span>(<span class="tok-string">"Guardando modelo..."</span>)
+model.save_pretrained(OUTPUT_PATH)
+tokenizer.save_pretrained(OUTPUT_PATH)
+<span class="tok-key">print</span>(<span class="tok-string">f"✅ Modelo guardado en: {OUTPUT_PATH}"</span>)</code></pre>
+        </div>
+
+        <h4>Ejecutar el entrenamiento</h4>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">powershell</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>python finetune.py</code></pre>
+        </div>
+
+        <h4>Lo que verás en pantalla</h4>
+        <div class="term-output">
+Cargando modelo base...<br>
+Cargando datos de entrenamiento...<br>
+¡Iniciando Fine-Tuning!<br>
+GPU: NVIDIA GeForce RTX 3070<br>
+<span class="tline">Step 10: loss=2.451</span><br>
+<span class="tline">Step 20: loss=1.832</span><br>
+<span class="tline">Step 50: loss=1.123</span><br>
+...<br>
+<span class="tline">✅ Modelo guardado en: ./modelo-finetuneado</span>
+        </div>
+
+        <h4>Configuración según tu GPU</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>GPU</th><th>VRAM</th><th>batch-size</th><th>lora_rank</th><th>load_in_4bit</th></tr></thead>
+            <tbody>
+              <tr><td>RTX 3060</td><td>8 GB</td><td>1</td><td>8</td><td>Sí (obligatorio)</td></tr>
+              <tr><td>RTX 3070/4060</td><td>8-12 GB</td><td>2</td><td>16</td><td>Sí</td></tr>
+              <tr><td>RTX 3080/4070</td><td>12-16 GB</td><td>4</td><td>32</td><td>Opcional</td></tr>
+              <tr><td>RTX 4080/4090</td><td>16-24 GB</td><td>8</td><td>64</td><td>No necesario</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <div class="sep-med"><div class="sep-med-line"></div><div class="sep-med-tag">Paso 5</div><div class="sep-med-line"></div></div>
+
+    <section class="section" id="probar" data-step="Probar">
+      <div class="section-title">08 — Paso 5</div>
+      <h2>Probar el Modelo Fine-Tuneado</h2>
+
+      <div class="mac-content">
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>python -m mlx_lm.generate \
+  --model ./modelo-base \
+  --adapter-path ./adaptadores \
+  --prompt "¿Cuál es la capital de Francia?" \
+  --max-tokens 200</code></pre>
+        </div>
+        <div class="box success">
+          <div class="box-title">✅ Validación</div>
+          Si el modelo responde con el estilo y contenido de tus datos de entrenamiento, ¡el fine-tuning funcionó!
+        </div>
+      </div>
+
+      <div class="windows-content">
+        <p>Crea un archivo <code class="inline">test.py</code>:</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">python</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code><span class="tok-key">from</span> unsloth <span class="tok-key">import</span> FastLanguageModel
+<span class="tok-key">import</span> torch
+
+MODEL_PATH = <span class="tok-string">"./modelo-finetuneado"</span>
+
+model, tokenizer = FastLanguageModel.from_pretrained(
+    model_name=MODEL_PATH,
+    max_seq_length=<span class="tok-num">2048</span>,
+    dtype=torch.float16,
+    load_in_4bit=<span class="tok-key">True</span>,
+)
+FastLanguageModel.for_inference(model)
+
+<span class="tok-key">def</span> preguntar(texto):
+    inputs = tokenizer(
+        <span class="tok-string">f"&lt;|im_start|&gt;user\n{texto}&lt;|im_end|&gt;\n&lt;|im_start|&gt;assistant\n"</span>,
+        return_tensors=<span class="tok-string">"pt"</span>
+    ).to(<span class="tok-string">"cuda"</span>)
+
+    outputs = model.generate(**inputs, max_new_tokens=<span class="tok-num">200</span>)
+    respuesta = tokenizer.decode(outputs[0], skip_special_tokens=<span class="tok-key">True</span>)
+    <span class="tok-key">return</span> respuesta
+
+<span class="tok-comment"># Prueba</span>
+<span class="tok-key">print</span>(preguntar(<span class="tok-string">"¿Cuál es la capital de Francia?"</span>))</code></pre>
+        </div>
+        <h4>Ejecutar</h4>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">powershell</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>python test.py</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <div class="sep-med"><div class="sep-med-line"></div><div class="sep-med-tag">Paso 6</div><div class="sep-med-line"></div></div>
+
+    <section class="section" id="ollama" data-step="Ollama">
+      <div class="section-title">09 — Paso 6 (Opcional)</div>
+      <h2>Llevar tu Modelo a Ollama</h2>
+
+      <div class="mac-content">
+        <h3>6.1 — Fusionar el modelo con los adaptadores</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>python -m mlx_lm.fuse \
+  --model ./modelo-base \
+  --adapter-path ./adaptadores \
+  --save-path ./modelo-fusionado</code></pre>
+        </div>
+
+        <h3>6.2 — Instalar llama.cpp para convertir</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>brew install llama.cpp</code></pre>
+        </div>
+
+        <h3>6.3 — Convertir a formato GGUF</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>python -c "
+import subprocess
+subprocess.run([
+    'python', '-m', 'mlx_lm.convert',
+    '--hf-path', './modelo-fusionado',
+    '--mlx-path', '/tmp/mlx-converted',
+    '-q'
+])
+"</code></pre>
+        </div>
+
+        <h3>6.4 — Crear el Modelfile</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>nano ~/finetuning/Modelfile</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Modelfile</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>FROM ./modelo-fusionado.gguf
+SYSTEM "Eres un asistente especializado. [Describe aquí el propósito de tu modelo]"
+PARAMETER temperature 0.7
+PARAMETER top_p 0.9</code></pre>
+        </div>
+
+        <h3>6.5 — Registrar en Ollama</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>ollama create mi-modelo-custom -f ~/finetuning/Modelfile
+ollama run mi-modelo-custom</code></pre>
+        </div>
+      </div>
+
+      <div class="windows-content">
+        <h3>6.1 — Exportar a GGUF con Unsloth</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">python</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code><span class="tok-comment"># Agrega esto al final de tu finetune.py o crea save_gguf.py</span>
+<span class="tok-key">from</span> unsloth <span class="tok-key">import</span> FastLanguageModel
+<span class="tok-key">import</span> torch
+
+model, tokenizer = FastLanguageModel.from_pretrained(
+    model_name=<span class="tok-string">"./modelo-finetuneado"</span>,
+    max_seq_length=<span class="tok-num">2048</span>,
+    dtype=torch.float16,
+    load_in_4bit=<span class="tok-key">True</span>,
+)
+
+<span class="tok-comment"># Exportar a GGUF (formato para Ollama)</span>
+model.save_pretrained_gguf(
+    <span class="tok-string">"./modelo-gguf"</span>,
+    tokenizer,
+    quantization_method=<span class="tok-string">"q4_k_m"</span>  <span class="tok-comment"># Buena calidad, tamaño reducido</span>
+)
+<span class="tok-key">print</span>(<span class="tok-string">"✅ Modelo exportado a GGUF"</span>)</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">powershell</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>python save_gguf.py</code></pre>
+        </div>
+
+        <h3>6.2 — Instalar Ollama en Windows</h3>
+        <p>Descarga desde: <a href="https://ollama.com/download/windows" target="_blank" rel="noopener">ollama.com/download/windows</a></p>
+
+        <h3>6.3 — Crear Modelfile</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">powershell</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>notepad C:\finetuning\Modelfile</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Modelfile</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>FROM C:\finetuning\modelo-gguf\unsloth.Q4_K_M.gguf
+SYSTEM "Eres un asistente especializado. [Describe aquí el propósito de tu modelo]"
+PARAMETER temperature 0.7</code></pre>
+        </div>
+
+        <h3>6.4 — Registrar en Ollama</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">powershell</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+          <pre><code>ollama create mi-modelo-custom -f C:\finetuning\Modelfile
+ollama run mi-modelo-custom</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <div class="sep-med"><div class="sep-med-line"></div><div class="sep-med-tag">Troubleshooting</div><div class="sep-med-line"></div></div>
+
+    <section class="section" id="errores" data-step="Errores">
+      <div class="section-title">10 — Troubleshooting</div>
+      <h2>Errores Frecuentes y Cómo Resolverlos</h2>
+
+      <div class="mac-content">
+        <div class="accordion" data-acc-group="mac">
+          <div class="acc-item">
+            <button class="acc-header" aria-expanded="false">
+              <span class="rule-tag r-crit">Crítico</span>
+              <span class="acc-title">RuntimeError: MPS backend out of memory</span>
+              <span class="acc-arrow">▾</span>
+            </button>
+            <div class="acc-body"><div class="acc-body-inner">
+              <p><strong>Causa:</strong> tu Mac se quedó sin RAM unificada disponible.</p>
+              <p><strong>Solución:</strong> reduce <code class="inline">--batch-size</code> a 1 y <code class="inline">--lora-layers</code> a 4. Cierra otras aplicaciones.</p>
+            </div></div>
+          </div>
+          <div class="acc-item">
+            <button class="acc-header" aria-expanded="false">
+              <span class="rule-tag r-warn">Importante</span>
+              <span class="acc-title">FileNotFoundError: train.jsonl</span>
+              <span class="acc-arrow">▾</span>
+            </button>
+            <div class="acc-body"><div class="acc-body-inner">
+              <p><strong>Causa:</strong> los archivos de datos no están en la ruta correcta.</p>
+              <p><strong>Solución:</strong> verifica con <code class="inline">ls ~/finetuning/data/</code> que existan train.jsonl y valid.jsonl.</p>
+            </div></div>
+          </div>
+          <div class="acc-item">
+            <button class="acc-header" aria-expanded="false">
+              <span class="rule-tag r-warn">Importante</span>
+              <span class="acc-title">JSONDecodeError</span>
+              <span class="acc-arrow">▾</span>
+            </button>
+            <div class="acc-body"><div class="acc-body-inner">
+              <p><strong>Causa:</strong> una línea de tu archivo JSONL tiene formato incorrecto.</p>
+              <p><strong>Solución:</strong> verifica que cada línea sea JSON válido. Usa <a href="https://jsonlint.com" target="_blank" rel="noopener">jsonlint.com</a> para validar.</p>
+            </div></div>
+          </div>
+          <div class="acc-item">
+            <button class="acc-header" aria-expanded="false">
+              <span class="rule-tag r-crit">Crítico</span>
+              <span class="acc-title">Loss no baja</span>
+              <span class="acc-arrow">▾</span>
+            </button>
+            <div class="acc-body"><div class="acc-body-inner">
+              <p><strong>Causa:</strong> datos insuficientes o de baja calidad, o learning rate muy alto.</p>
+              <p><strong>Solución:</strong> agrega más ejemplos variados y de calidad. Verifica que las respuestas en tus datos sean coherentes.</p>
+            </div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="windows-content">
+        <div class="accordion" data-acc-group="win">
+          <div class="acc-item">
+            <button class="acc-header" aria-expanded="false">
+              <span class="rule-tag r-crit">Crítico</span>
+              <span class="acc-title">CUDA out of memory</span>
+              <span class="acc-arrow">▾</span>
+            </button>
+            <div class="acc-body"><div class="acc-body-inner">
+              <p><strong>Causa:</strong> la GPU no tiene suficiente VRAM.</p>
+              <p><strong>Solución:</strong> activa <code class="inline">load_in_4bit=True</code>, reduce <code class="inline">BATCH_SIZE</code> a 1, reduce <code class="inline">LORA_RANK</code> a 8.</p>
+            </div></div>
+          </div>
+          <div class="acc-item">
+            <button class="acc-header" aria-expanded="false">
+              <span class="rule-tag r-warn">Importante</span>
+              <span class="acc-title">torch.cuda.is_available() returns False</span>
+              <span class="acc-arrow">▾</span>
+            </button>
+            <div class="acc-body"><div class="acc-body-inner">
+              <p><strong>Causa:</strong> PyTorch no detecta la GPU NVIDIA.</p>
+              <p><strong>Solución:</strong> reinstala PyTorch con el comando correcto para CUDA 12.1:</p>
+              <div class="code-block">
+                <div class="code-header"><span class="code-lang">powershell</span><button class="copy-btn"><span class="cp-ico">📋</span><span class="cp-label">Copiar</span></button></div>
+                <pre><code>pip uninstall torch torchvision torchaudio
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121</code></pre>
+              </div>
+            </div></div>
+          </div>
+          <div class="acc-item">
+            <button class="acc-header" aria-expanded="false">
+              <span class="rule-tag r-warn">Importante</span>
+              <span class="acc-title">ModuleNotFoundError: No module named 'unsloth'</span>
+              <span class="acc-arrow">▾</span>
+            </button>
+            <div class="acc-body"><div class="acc-body-inner">
+              <p><strong>Causa:</strong> las librerías no están instaladas o el entorno virtual no está activo.</p>
+              <p><strong>Solución:</strong> activa el entorno con <code class="inline">finetuning-env\Scripts\activate</code> antes de cualquier comando.</p>
+            </div></div>
+          </div>
+          <div class="acc-item">
+            <button class="acc-header" aria-expanded="false">
+              <span class="rule-tag r-warn">Importante</span>
+              <span class="acc-title">"The model's vocab size..."</span>
+              <span class="acc-arrow">▾</span>
+            </button>
+            <div class="acc-body"><div class="acc-body-inner">
+              <p><strong>Causa:</strong> incompatibilidad entre el tokenizer y el modelo.</p>
+              <p><strong>Solución:</strong> asegúrate de que <code class="inline">MODEL_PATH</code> en test.py apunta a <code class="inline">./modelo-finetuneado</code> (no al modelo base).</p>
+            </div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="footer-wrap">
+  <div class="inf-ft">
+    <div class="ft-av">👤</div>
+    <div><div class="ft-name">Guía Fine-Tuning Local</div><div class="ft-desc">Material de práctica académica</div></div>
+  </div>
+  <p class="footer-text">Guía construida para uso educativo y práctico. Los modelos de lenguaje son herramientas poderosas — úsalos con responsabilidad.</p>
+  <div class="footer-links">
+    <a href="https://huggingface.co" target="_blank" rel="noopener">HuggingFace</a>
+    <a href="https://ml-explore.github.io/mlx/" target="_blank" rel="noopener">Documentación MLX</a>
+    <a href="https://github.com/unslothai/unsloth" target="_blank" rel="noopener">Unsloth GitHub</a>
+    <a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a>
+  </div>
+  <p class="footer-credit">Basado en mejores prácticas de la comunidad ML open-source (2024–2025)</p>
+</div>
+
+<script>
+function setColorMode(m){
+  document.documentElement.setAttribute('data-mode', m);
+  document.querySelectorAll('.mode-btn').forEach(function(b){ b.classList.toggle('is-active', b.dataset.m === m); });
+  try{ localStorage.setItem('ft-color-mode', m); }catch(e){}
+}
+(function(){
+  var stored = null;
+  try{ stored = localStorage.getItem('ft-color-mode'); }catch(e){}
+  var initial = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  setColorMode(initial);
+  if(!stored && window.matchMedia){
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+      var s = null; try{ s = localStorage.getItem('ft-color-mode'); }catch(err){}
+      if(!s) setColorMode(e.matches ? 'dark' : 'light');
+    });
+  }
+})();
+</script>
+<script>
+(function(){
+  var STEPS = [
+    {id:'fundamentos', label:'Qué es'},
+    {id:'requisitos', label:'Requisitos'},
+    {id:'pipeline', label:'Pipeline'},
+    {id:'instalar', label:'Instalar'},
+    {id:'descargar', label:'Descargar'},
+    {id:'datos', label:'Datos'},
+    {id:'entrenamiento', label:'Entrenar'},
+    {id:'probar', label:'Probar'},
+    {id:'ollama', label:'Ollama'},
+    {id:'errores', label:'Errores'}
+  ];
+
+  function buildStepList(container){
+    STEPS.forEach(function(step, i){
+      var li = document.createElement('li');
+      var a = document.createElement('a');
+      a.href = '#' + step.id;
+      a.className = 'step-link';
+      a.dataset.target = step.id;
+      a.innerHTML = '<span class="step-num">' + (i+1) + '</span><span>' + step.label + '</span>';
+      li.appendChild(a);
+      container.appendChild(li);
+    });
+  }
+  buildStepList(document.getElementById('desktopStepList'));
+  buildStepList(document.getElementById('mobileStepList'));
+
+  var allStepLinks = document.querySelectorAll('.step-link');
+  var sections = STEPS.map(function(s){ return document.getElementById(s.id); });
+
+  function setActive(id){
+    allStepLinks.forEach(function(link){
+      link.classList.toggle('active', link.dataset.target === id);
+    });
+  }
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, {rootMargin:'-15% 0px -70% 0px', threshold:0});
+  sections.forEach(function(sec){ if(sec) observer.observe(sec); });
+
+  function setPlatform(platform){
+    document.body.classList.remove('platform-mac','platform-windows');
+    document.body.classList.add('platform-' + platform);
+    document.querySelectorAll('.tab-btn').forEach(function(b){
+      b.classList.toggle('is-active', b.dataset.platform === platform);
+    });
+    try{ localStorage.setItem('ft-platform', platform); }catch(e){}
+  }
+  document.querySelectorAll('.tab-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){ setPlatform(btn.dataset.platform); });
+  });
+  var savedPlatform = 'mac';
+  try{ savedPlatform = localStorage.getItem('ft-platform') || 'mac'; }catch(e){}
+  setPlatform(savedPlatform);
+
+  document.querySelectorAll('.copy-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var block = btn.closest('.code-block');
+      var code = block.querySelector('code').innerText;
+      navigator.clipboard.writeText(code).then(function(){
+        var ico = btn.querySelector('.cp-ico');
+        var label = btn.querySelector('.cp-label');
+        var prevIco = ico.textContent, prevLabel = label.textContent;
+        ico.textContent = '✓';
+        label.textContent = 'Copiado';
+        btn.classList.add('copied');
+        setTimeout(function(){
+          ico.textContent = prevIco;
+          label.textContent = prevLabel;
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    });
+  });
+
+  document.querySelectorAll('.acc-header').forEach(function(header){
+    header.addEventListener('click', function(){
+      var body = header.nextElementSibling;
+      var group = header.closest('.accordion');
+      var isOpen = header.getAttribute('aria-expanded') === 'true';
+      group.querySelectorAll('.acc-header').forEach(function(h){
+        h.setAttribute('aria-expanded', 'false');
+        h.nextElementSibling.style.maxHeight = null;
+      });
+      if(!isOpen){
+        header.setAttribute('aria-expanded', 'true');
+        body.style.maxHeight = body.scrollHeight + 'px';
+      }
+    });
+  });
+
+  var hamburgerBtn = document.getElementById('hamburgerBtn');
+  var mobileDrawer = document.getElementById('mobileDrawer');
+  var drawerOverlay = document.getElementById('drawerOverlay');
+  function closeDrawer(){
+    hamburgerBtn.classList.remove('open');
+    mobileDrawer.classList.remove('open');
+    drawerOverlay.classList.remove('open');
+  }
+  hamburgerBtn.addEventListener('click', function(){
+    var open = mobileDrawer.classList.toggle('open');
+    hamburgerBtn.classList.toggle('open', open);
+    drawerOverlay.classList.toggle('open', open);
+  });
+  drawerOverlay.addEventListener('click', closeDrawer);
+  document.getElementById('mobileStepList').addEventListener('click', function(e){
+    if(e.target.closest('a')) closeDrawer();
+  });
+
+  var progressBar = document.getElementById('progressBar');
+  function updateProgress(){
+    var scrollable = document.documentElement.scrollHeight - window.innerHeight;
+    var pct = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
+    progressBar.style.width = pct + '%';
+  }
+  window.addEventListener('scroll', updateProgress, {passive:true});
+  updateProgress();
+})();
+</script>
+</body>
+</html>

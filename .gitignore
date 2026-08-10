@@ -1,0 +1,22 @@
+# Entornos virtuales de Python
+venv/
+venv-gguf/
+__pycache__/
+*.pyc
+
+# Pesos de modelos y binarios pesados (no van en git)
+modelo-base/
+modelo-fusionado/
+adaptadores/
+*.safetensors
+*.gguf
+*.bin
+
+# Herramientas de terceros clonadas (llama.cpp)
+llama.cpp-tools/
+
+# Sistema / editor
+.DS_Store
+.claude/
+Icon
+Icon?

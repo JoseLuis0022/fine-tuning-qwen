@@ -1,0 +1,78 @@
+
+Cargando Qwen3-8B-FineTuned...
+Modelo cargado
+
+  [01/16] Evaluando: Ejecuta ls -la en el directorio actual...
+       [OK] Bash [3.7s]
+  [02/16] Evaluando: ¿Cuántos archivos Python hay en el proyecto?...
+       [FAIL] Glob [3.5s]
+  [03/16] Evaluando: Lee el archivo src/main.py...
+       [OK] Read [3.6s]
+  [04/16] Evaluando: Muéstrame el contenido de config.json...
+       [OK] Read [3.5s]
+  [05/16] Evaluando: Crea un archivo llamado hello.py con un print de Hola Mundo...
+       [OK] Write [3.9s]
+  [06/16] Evaluando: Actualiza la versión de 1.0.0 a 2.0.0 en package.json (léelo...
+       [OK] Read [3.7s]
+  [07/16] Evaluando: ¿Dónde se importa axios en el proyecto?...
+       [OK] Grep [4.0s]
+  [08/16] Evaluando: Busca todos los TODO en archivos .py...
+       [FAIL] Glob [3.5s]
+  [09/16] Evaluando: Lista todos los archivos TypeScript del proyecto...
+       [OK] Glob [3.4s]
+  [10/16] Evaluando: Encuentra todos los archivos de configuración .env...
+       [OK] Glob [3.4s]
+  [11/16] Evaluando: Muéstrame qué hay en la carpeta components/...
+       [OK] LS [3.3s]
+  [12/16] Evaluando: ¿Qué archivos tiene el directorio tests?...
+       [OK] LS [3.3s]
+  [13/16] Evaluando: Busca ejemplos de uso de React hooks...
+       [OK] WebSearch [3.5s]
+  [14/16] Evaluando: ¿Qué contiene analysis.ipynb?...
+       [OK] NotebookRead [3.6s]
+  [15/16] Evaluando: ¿Qué es una función recursiva?...
+       [OK] None [4.7s]
+  [16/16] Evaluando: ¿Cuál es la diferencia entre == y === en JavaScript?...
+       [OK] None [4.1s]
+
+============================================================
+  REPORTE DE BENCHMARK — Qwen3-8B-FineTuned
+  2026-06-22 15:06:22
+============================================================
+
+  METRICAS PRINCIPALES
+  --------------------------------------------------------
+  TCR  Tool Call Rate        100.0%   (14/14)
+  TNA  Tool Name Accuracy     85.7%   (12/14)
+  JVA  JSON Valid Args       100.0%   (14/14)
+  ACA  Args Keys Accuracy     92.9%   (13/14)
+  NHR  No Hallucination      100.0%   (2/2)
+  --------------------------------------------------------
+  SCORE FINAL                87.5%   (14/16)
+
+  Tiempo de evaluación: 58.7s  (3.7s/caso)
+
+  DETALLE POR CASO
+  --------------------------------------------------------
+  [OK  ] [bash_1    ] -> Bash
+  [FAIL] [bash_2    ] -> Glob
+          Args faltantes: {'command'}
+  [OK  ] [read_1    ] -> Read
+  [OK  ] [read_2    ] -> Read
+  [OK  ] [write_1   ] -> Write
+  [OK  ] [edit_1    ] -> Read
+  [OK  ] [grep_1    ] -> Grep
+  [FAIL] [grep_2    ] -> Glob
+          Herramienta incorrecta: usó 'Glob', esperaba 'Grep'
+  [OK  ] [glob_1    ] -> Glob
+  [OK  ] [glob_2    ] -> Glob
+  [OK  ] [ls_1      ] -> LS
+  [OK  ] [ls_2      ] -> LS
+  [OK  ] [web_1     ] -> WebSearch
+  [OK  ] [nb_1      ] -> NotebookRead
+  [OK  ] [direct_1  ] -> (sin herramienta)
+  [OK  ] [direct_2  ] -> (sin herramienta)
+
+============================================================
+
+Reporte guardado en: resultados/benchmark_qwen3-8b-finetuned.json

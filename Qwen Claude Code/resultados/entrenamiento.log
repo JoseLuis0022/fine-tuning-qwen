@@ -1,0 +1,37 @@
+Iter 0: Val loss 2.525
+Iter 10: Train loss 0.743, LR 1.0e-04, It/sec 0.08, Tokens/sec 79.3, Peak mem 12.23 GB
+Iter 20: Train loss 0.197, LR 1.0e-04, It/sec 0.08, Tokens/sec 82.3, Peak mem 12.23 GB
+Iter 30: Train loss 0.155, LR 1.0e-04, It/sec 0.08, Tokens/sec 77.1, Peak mem 12.23 GB
+Iter 40: Train loss 0.149, LR 1.0e-04, It/sec 0.07, Tokens/sec 74.2, Peak mem 12.57 GB
+Iter 49: Val loss 0.149
+Iter 50: Train loss 0.126, LR 1.0e-04, It/sec 0.08, Tokens/sec 74.2, Peak mem 12.57 GB
+Iter 60: Train loss 0.132, LR 1.0e-04, It/sec 0.08, Tokens/sec 79.6, Peak mem 12.57 GB
+Iter 70: Train loss 0.120, LR 1.0e-04, It/sec 0.07, Tokens/sec 75.7, Peak mem 12.57 GB
+Iter 80: Train loss 0.081, LR 1.0e-04, It/sec 0.08, Tokens/sec 81.0, Peak mem 12.57 GB
+Iter 90: Train loss 0.121, LR 1.0e-04, It/sec 0.08, Tokens/sec 78.9, Peak mem 12.57 GB
+Iter 99: Val loss 0.099
+Iter 100: Train loss 0.117, LR 1.0e-04, It/sec 0.08, Tokens/sec 77.5, Peak mem 12.57 GB
+Iter 110: Train loss 0.089, LR 1.0e-04, It/sec 0.07, Tokens/sec 74.0, Peak mem 12.57 GB
+Iter 120: Train loss 0.095, LR 1.0e-04, It/sec 0.08, Tokens/sec 77.8, Peak mem 12.57 GB
+Iter 130: Train loss 0.132, LR 1.0e-04, It/sec 0.07, Tokens/sec 76.2, Peak mem 12.57 GB
+Iter 140: Train loss 0.114, LR 1.0e-04, It/sec 0.08, Tokens/sec 77.9, Peak mem 12.61 GB
+Iter 149: Val loss 0.096
+Iter 150: Train loss 0.077, LR 1.0e-04, It/sec 0.08, Tokens/sec 78.4, Peak mem 12.61 GB
+Iter 160: Train loss 0.072, LR 1.0e-04, It/sec 0.08, Tokens/sec 73.9, Peak mem 12.61 GB
+Iter 170: Train loss 0.132, LR 1.0e-04, It/sec 0.07, Tokens/sec 70.8, Peak mem 12.61 GB
+Iter 180: Train loss 0.073, LR 1.0e-04, It/sec 0.09, Tokens/sec 89.0, Peak mem 12.61 GB
+Iter 190: Train loss 0.093, LR 1.0e-04, It/sec 0.09, Tokens/sec 84.7, Peak mem 12.61 GB
+Iter 199: Val loss 0.069
+Iter 200: Train loss 0.080, LR 1.0e-04, It/sec 0.08, Tokens/sec 82.2, Peak mem 12.61 GB
+Iter 210: Train loss 0.087, LR 1.0e-04, It/sec 0.07, Tokens/sec 76.2, Peak mem 12.61 GB
+Iter 220: Train loss 0.080, LR 1.0e-04, It/sec 0.08, Tokens/sec 81.3, Peak mem 12.61 GB
+Iter 230: Train loss 0.070, LR 1.0e-04, It/sec 0.08, Tokens/sec 77.3, Peak mem 12.61 GB
+Iter 240: Train loss 0.069, LR 1.0e-04, It/sec 0.07, Tokens/sec 75.8, Peak mem 12.61 GB
+Iter 249: Val loss 0.080
+Iter 250: Train loss 0.073, LR 1.0e-04, It/sec 0.08, Tokens/sec 78.5, Peak mem 12.61 GB
+Iter 260: Train loss 0.062, LR 1.0e-04, It/sec 0.08, Tokens/sec 82.0, Peak mem 12.61 GB
+Iter 270: Train loss 0.065, LR 1.0e-04, It/sec 0.08, Tokens/sec 80.0, Peak mem 12.61 GB
+Iter 280: Train loss 0.076, LR 1.0e-04, It/sec 0.08, Tokens/sec 81.1, Peak mem 12.61 GB
+Iter 290: Train loss 0.076, LR 1.0e-04, It/sec 0.08, Tokens/sec 77.6, Peak mem 12.61 GB
+Iter 299: Val loss 0.067
+Iter 300: Train loss 0.083, LR 1.0e-04, It/sec 0.08, Tokens/sec 81.3, Peak mem 12.61 GB

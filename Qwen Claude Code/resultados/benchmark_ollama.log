@@ -1,0 +1,76 @@
+
+Benchmark via Ollama -> modelo 'qwen3-toolcalling'
+  [01/16] Ejecuta ls -la en el directorio actual...
+       [OK] Bash [6.5s]
+  [02/16] ¿Cuántos archivos Python hay en el proyecto?...
+       [FAIL] Glob [1.0s]
+  [03/16] Lee el archivo src/main.py...
+       [OK] Read [1.0s]
+  [04/16] Muéstrame el contenido de config.json...
+       [OK] Read [1.0s]
+  [05/16] Crea un archivo llamado hello.py con un print de Hola M...
+       [OK] Write [1.3s]
+  [06/16] Actualiza la versión de 1.0.0 a 2.0.0 en package.json (...
+       [OK] Read [1.0s]
+  [07/16] ¿Dónde se importa axios en el proyecto?...
+       [OK] Grep [1.4s]
+  [08/16] Busca todos los TODO en archivos .py...
+       [FAIL] Glob [1.0s]
+  [09/16] Lista todos los archivos TypeScript del proyecto...
+       [OK] Glob [1.0s]
+  [10/16] Encuentra todos los archivos de configuración .env...
+       [OK] Glob [1.0s]
+  [11/16] Muéstrame qué hay en la carpeta components/...
+       [OK] LS [0.9s]
+  [12/16] ¿Qué archivos tiene el directorio tests?...
+       [OK] LS [0.9s]
+  [13/16] Busca ejemplos de uso de React hooks...
+       [OK] WebSearch [1.0s]
+  [14/16] ¿Qué contiene analysis.ipynb?...
+       [OK] NotebookRead [1.1s]
+  [15/16] ¿Qué es una función recursiva?...
+       [OK] None [2.3s]
+  [16/16] ¿Cuál es la diferencia entre == y === en JavaScript?...
+       [OK] None [1.6s]
+
+============================================================
+  REPORTE DE BENCHMARK — Qwen3-8B-Ollama-Q4
+  2026-06-22 19:00:56
+============================================================
+
+  METRICAS PRINCIPALES
+  --------------------------------------------------------
+  TCR  Tool Call Rate        100.0%   (14/14)
+  TNA  Tool Name Accuracy     85.7%   (12/14)
+  JVA  JSON Valid Args       100.0%   (14/14)
+  ACA  Args Keys Accuracy     92.9%   (13/14)
+  NHR  No Hallucination      100.0%   (2/2)
+  --------------------------------------------------------
+  SCORE FINAL                87.5%   (14/16)
+
+  Tiempo de evaluación: 23.9s  (1.5s/caso)
+
+  DETALLE POR CASO
+  --------------------------------------------------------
+  [OK  ] [bash_1    ] -> Bash
+  [FAIL] [bash_2    ] -> Glob
+          Args faltantes: {'command'}
+  [OK  ] [read_1    ] -> Read
+  [OK  ] [read_2    ] -> Read
+  [OK  ] [write_1   ] -> Write
+  [OK  ] [edit_1    ] -> Read
+  [OK  ] [grep_1    ] -> Grep
+  [FAIL] [grep_2    ] -> Glob
+          Herramienta incorrecta: usó 'Glob', esperaba 'Grep'
+  [OK  ] [glob_1    ] -> Glob
+  [OK  ] [glob_2    ] -> Glob
+  [OK  ] [ls_1      ] -> LS
+  [OK  ] [ls_2      ] -> LS
+  [OK  ] [web_1     ] -> WebSearch
+  [OK  ] [nb_1      ] -> NotebookRead
+  [OK  ] [direct_1  ] -> (sin herramienta)
+  [OK  ] [direct_2  ] -> (sin herramienta)
+
+============================================================
+
+Reporte guardado en: resultados/benchmark_qwen3-8b-ollama-q4.json

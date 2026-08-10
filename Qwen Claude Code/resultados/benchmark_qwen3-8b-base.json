@@ -1,0 +1,252 @@
+{
+  "modelo": "Qwen3-8B-BASE",
+  "timestamp": "2026-06-22T12:21:09.556073",
+  "score_final": 43.75,
+  "metricas": {
+    "TCR": 50.0,
+    "TNA": 35.71,
+    "JVA": 50.0,
+    "ACA": 42.86,
+    "NHR": 100.0
+  },
+  "detalle": [
+    {
+      "id": "bash_1",
+      "prompt": "Ejecuta ls -la en el directorio actual",
+      "output_raw": "<think>\nOkay, the user wants me to run the 'ls -la' command in the current directory. Let me check the available tools. There's a 'LS' tool that takes a path parameter. Since they specified the current directory, I don't need to provide a path. The command should be straightforward. I'll call the LS...",
+      "tool_llamada": true,
+      "tool_correcta": false,
+      "json_valido": true,
+      "args_correctos": false,
+      "comportamiento_correcto": false,
+      "tool_detectada": "LS",
+      "args_detectados": [
+        "path"
+      ],
+      "error": "Args faltantes: {'command'}",
+      "tiempo_segundos": 9.26
+    },
+    {
+      "id": "bash_2",
+      "prompt": "¿Cuántos archivos Python hay en el proyecto?",
+      "output_raw": "<think>\nOkay, the user is asking how many Python files are in the project. Let me think about how to approach this.\n\nFirst, I need to figure out the directory structure of the project. The user mentioned \"el proyecto,\" which I assume is the current working directory unless specified otherwise. So, I...",
+      "tool_llamada": false,
+      "tool_correcta": false,
+      "json_valido": false,
+      "args_correctos": false,
+      "comportamiento_correcto": false,
+      "tool_detectada": null,
+      "args_detectados": [],
+      "error": "No emitió tool_call (esperado: Bash)",
+      "tiempo_segundos": 9.37
+    },
+    {
+      "id": "read_1",
+      "prompt": "Lee el archivo src/main.py",
+      "output_raw": "<think>\nOkay, the user wants me to read the file src/main.py. Let me check which tool I can use for that. Oh right, there's the Read() function which takes a file path. So I need to call Read with the argument file_path set to \"src/main.py\". I should make sure there are no typos in the path. Let me ...",
+      "tool_llamada": true,
+      "tool_correcta": true,
+      "json_valido": true,
+      "args_correctos": true,
+      "comportamiento_correcto": true,
+      "tool_detectada": "Read",
+      "args_detectados": [
+        "file_path"
+      ],
+      "error": null,
+      "tiempo_segundos": 5.92
+    },
+    {
+      "id": "read_2",
+      "prompt": "Muéstrame el contenido de config.json",
+      "output_raw": "<think>\nOkay, the user is asking to see the contents of config.json. Let me check which tools I have available. There's the Read function that takes a file path. So I need to use that to read the config.json file. I should make sure the file path is correct. Assuming config.json is in the current di...",
+      "tool_llamada": true,
+      "tool_correcta": true,
+      "json_valido": true,
+      "args_correctos": true,
+      "comportamiento_correcto": true,
+      "tool_detectada": "Read",
+      "args_detectados": [
+        "file_path"
+      ],
+      "error": null,
+      "tiempo_segundos": 5.43
+    },
+    {
+      "id": "write_1",
+      "prompt": "Crea un archivo llamado hello.py con un print de Hola Mundo",
+      "output_raw": "<think>\nOkay, the user wants me to create a file called hello.py with a print statement for \"Hola Mundo\". Let me think about how to approach this.\n\nFirst, I need to use the Write tool because that's for creating or overwriting a file. The parameters required are the file path and the content. The fi...",
+      "tool_llamada": false,
+      "tool_correcta": false,
+      "json_valido": false,
+      "args_correctos": false,
+      "comportamiento_correcto": false,
+      "tool_detectada": null,
+      "args_detectados": [],
+      "error": "No emitió tool_call (esperado: Write)",
+      "tiempo_segundos": 9.34
+    },
+    {
+      "id": "edit_1",
+      "prompt": "Actualiza la versión de 1.0.0 a 2.0.0 en package.json (léelo primero)",
+      "output_raw": "<think>\nOkay, the user wants to update the version from 1.0.0 to 2.0.0 in package.json. First, I need to read the current package.json file to see the existing version. Let me use the Read tool for that. The path is probably \"package.json\".\n\nOnce I have the content, I'll check the version field. If ...",
+      "tool_llamada": false,
+      "tool_correcta": false,
+      "json_valido": false,
+      "args_correctos": false,
+      "comportamiento_correcto": false,
+      "tool_detectada": null,
+      "args_detectados": [],
+      "error": "No emitió tool_call (esperado: Read)",
+      "tiempo_segundos": 9.59
+    },
+    {
+      "id": "grep_1",
+      "prompt": "¿Dónde se importa axios en el proyecto?",
+      "output_raw": "<think>\nOkay, the user is asking where axios is imported in the project. Let me think about how to approach this.\n\nFirst, I need to figure out the project structure. Since I don't have the actual files, I should use the available tools. The Glob tool can search for files that might contain import st...",
+      "tool_llamada": true,
+      "tool_correcta": false,
+      "json_valido": true,
+      "args_correctos": true,
+      "comportamiento_correcto": false,
+      "tool_detectada": "Glob",
+      "args_detectados": [
+        "pattern"
+      ],
+      "error": "Herramienta incorrecta: usó 'Glob', esperaba 'Grep'",
+      "tiempo_segundos": 10.25
+    },
+    {
+      "id": "grep_2",
+      "prompt": "Busca todos los TODO en archivos .py",
+      "output_raw": "<think>\nOkay, the user wants to find all the TODOs in .py files. Let me think about how to approach this.\n\nFirst, I need to search through all Python files for lines containing \"TODO\". The Grep tool seems suitable for this. But wait, the Grep function's parameters are pattern, path, and include. The...",
+      "tool_llamada": false,
+      "tool_correcta": false,
+      "json_valido": false,
+      "args_correctos": false,
+      "comportamiento_correcto": false,
+      "tool_detectada": null,
+      "args_detectados": [],
+      "error": "No emitió tool_call (esperado: Grep)",
+      "tiempo_segundos": 9.33
+    },
+    {
+      "id": "glob_1",
+      "prompt": "Lista todos los archivos TypeScript del proyecto",
+      "output_raw": "<think>\nOkay, the user wants me to list all the TypeScript files in the project. Let me think about how to approach this.\n\nFirst, I need to figure out how to find all TypeScript files. TypeScript files usually have the extension .ts. So maybe I can use a command to search for files with that extensi...",
+      "tool_llamada": false,
+      "tool_correcta": false,
+      "json_valido": false,
+      "args_correctos": false,
+      "comportamiento_correcto": false,
+      "tool_detectada": null,
+      "args_detectados": [],
+      "error": "No emitió tool_call (esperado: Glob)",
+      "tiempo_segundos": 9.32
+    },
+    {
+      "id": "glob_2",
+      "prompt": "Encuentra todos los archivos de configuración .env",
+      "output_raw": "<think>\nOkay, the user wants to find all the .env files in the current directory. Let me think about how to approach this.\n\nFirst, I remember that .env files are typically configuration files, so they might be in the current working directory or subdirectories. The user didn't specify a path, so I s...",
+      "tool_llamada": false,
+      "tool_correcta": false,
+      "json_valido": false,
+      "args_correctos": false,
+      "comportamiento_correcto": false,
+      "tool_detectada": null,
+      "args_detectados": [],
+      "error": "No emitió tool_call (esperado: Glob)",
+      "tiempo_segundos": 9.31
+    },
+    {
+      "id": "ls_1",
+      "prompt": "Muéstrame qué hay en la carpeta components/",
+      "output_raw": "<think>\nOkay, the user is asking to see what's in the \"components/\" directory. Let me figure out how to handle this.\n\nFirst, I need to list the contents of the directory. The available tools include \"LS(path)\", which lists a directory. So I should use that. The path would be \"components/\".\n\nWait, do...",
+      "tool_llamada": true,
+      "tool_correcta": true,
+      "json_valido": true,
+      "args_correctos": true,
+      "comportamiento_correcto": true,
+      "tool_detectada": "LS",
+      "args_detectados": [
+        "path"
+      ],
+      "error": null,
+      "tiempo_segundos": 8.17
+    },
+    {
+      "id": "ls_2",
+      "prompt": "¿Qué archivos tiene el directorio tests?",
+      "output_raw": "<think>\nOkay, the user is asking what files are in the \"tests\" directory. Let me see. The available tools include LS(path), which lists a directory. So I need to use LS with the path set to \"tests\". I should check if there are any other parameters, but the description says LS(path) lists the directo...",
+      "tool_llamada": true,
+      "tool_correcta": true,
+      "json_valido": true,
+      "args_correctos": true,
+      "comportamiento_correcto": true,
+      "tool_detectada": "LS",
+      "args_detectados": [
+        "path"
+      ],
+      "error": null,
+      "tiempo_segundos": 5.58
+    },
+    {
+      "id": "web_1",
+      "prompt": "Busca ejemplos de uso de React hooks",
+      "output_raw": "<think>\nOkay, the user wants examples of using React hooks. Let me think about how to approach this. First, I need to find reliable sources. React's official documentation is the best place to start. I remember that the useState and useEffect hooks are fundamental, so examples for those would be goo...",
+      "tool_llamada": false,
+      "tool_correcta": false,
+      "json_valido": false,
+      "args_correctos": false,
+      "comportamiento_correcto": false,
+      "tool_detectada": null,
+      "args_detectados": [],
+      "error": "No emitió tool_call (esperado: WebSearch)",
+      "tiempo_segundos": 9.37
+    },
+    {
+      "id": "nb_1",
+      "prompt": "¿Qué contiene analysis.ipynb?",
+      "output_raw": "<think>\nOkay, the user is asking what's inside analysis.ipynb. I need to figure out how to check the contents of that Jupyter notebook. Let me recall the available tools. There's the NotebookRead function which allows reading a Jupyter notebook. So I should use that tool to get the contents. The fun...",
+      "tool_llamada": true,
+      "tool_correcta": true,
+      "json_valido": true,
+      "args_correctos": true,
+      "comportamiento_correcto": true,
+      "tool_detectada": "NotebookRead",
+      "args_detectados": [
+        "notebook_path"
+      ],
+      "error": null,
+      "tiempo_segundos": 6.87
+    },
+    {
+      "id": "direct_1",
+      "prompt": "¿Qué es una función recursiva?",
+      "output_raw": "<think>\nOkay, the user is asking, \"¿Qué es una función recursiva?\" which means \"What is a recursive function?\" in Spanish. Let me start by recalling what I know about recursive functions.\n\nA recursive function is a function that calls itself during its execution. This allows the function to be repea...",
+      "tool_llamada": false,
+      "tool_correcta": true,
+      "json_valido": false,
+      "args_correctos": true,
+      "comportamiento_correcto": true,
+      "tool_detectada": null,
+      "args_detectados": [],
+      "error": null,
+      "tiempo_segundos": 9.32
+    },
+    {
+      "id": "direct_2",
+      "prompt": "¿Cuál es la diferencia entre == y === en JavaScript?",
+      "output_raw": "<think>\nOkay, the user is asking about the difference between == and === in JavaScript. I need to explain this clearly. Let me start by recalling what I know.\n\nFirst, == is the equality operator, and === is the strict equality operator. The main difference is that === checks both value and type, whi...",
+      "tool_llamada": false,
+      "tool_correcta": true,
+      "json_valido": false,
+      "args_correctos": true,
+      "comportamiento_correcto": true,
+      "tool_detectada": null,
+      "args_detectados": [],
+      "error": null,
+      "tiempo_segundos": 9.45
+    }
+  ]
+}
